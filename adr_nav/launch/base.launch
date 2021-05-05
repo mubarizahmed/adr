@@ -1,0 +1,3 @@
+<launch>
+    <node name="base_node" pkg="adr_nav" type="base" output="screen"/>
+</launch>

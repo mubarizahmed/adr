@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find leo_gazebo)/launch/leo_gazebo.launch"
+           pass_all_args="true">
+    <arg name="world_name" value="$(find adr_sim)/worlds/dolly_city.world"/>
+    <arg name="x" default="-37"/>
+    <arg name="y" default="5.6"/>
+    <arg name="z" default="1.0"/>
+  </include>
+</launch>
