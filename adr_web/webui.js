@@ -34,7 +34,7 @@ function initVelocityPublisher() {
     // Init topic object
     cmdVel = new ROSLIB.Topic({
         ros: ros,
-        name: '/cmd_vel',
+        name: 'controllers/diff_drive/cmd_vel',
         messageType: 'geometry_msgs/Twist'
     });
     // Register publisher within ROS system
@@ -49,7 +49,7 @@ function initTeleopKeyboard() {
         // Initialize the teleop.
         teleop = new KEYBOARDTELEOP.Teleop({
             ros: ros,
-            topic: '/cmd_vel'
+            topic: 'controllers/diff_drive/cmd_vel'
         });
     }
 
@@ -110,7 +110,7 @@ window.onload = function () {
     // determine robot address automatically
     // robot_IP = location.hostname;
     // set robot address statically
-    robot_IP = "10.5.10.117";
+    robot_IP = "0.0.0.0";
 
     // // Init handle for rosbridge_websocket
     ros = new ROSLIB.Ros({
@@ -121,7 +121,7 @@ window.onload = function () {
     // get handle for video placeholder
     video = document.getElementById('video');
     // Populate video source 
-    video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/rgb/image_raw&type=mjpeg&quality=80";
+    video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/image_raw&type=mjpeg&quality=80";
     video.onload = function () {
         // joystick and keyboard controls will be available only when video is correctly loaded
         createJoystick();
