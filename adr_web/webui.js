@@ -15,6 +15,7 @@ function moveAction(linear, angular) {
         twist.angular.z = 0;
     }
     cmdVel.publish(twist);
+
 }
 
 function initVelocityPublisher() {
@@ -59,7 +60,17 @@ function initTeleopKeyboard() {
         teleop.scale = robotSpeedRange.value / 100
     }
 }
-
+function initGPS(){
+    var gps_listener = new ROSLIB.Topic({
+        ros : ros,
+        name : '/sensor_msgs/NavSatFix',
+        messageType : 'sensor_msgs/NavSatFix',
+      });
+    
+    gps_listener.subscribe(function(m) {
+        document.getElementById("gps-text").innerHTML = "Latitude: "+String(m.latitude)+"\nLongitude: "+String(m.longitude);
+    });
+}
 function createJoystick() {
     // Check if joystick was aready created
     if (manager == null) {
@@ -116,7 +127,7 @@ window.onload = function () {
     ros = new ROSLIB.Ros({
         url: "ws://" + robot_IP + ":9090"
     });
-
+    initGPS();
     initVelocityPublisher();
     // get handle for video placeholder
     video = document.getElementById('video');
