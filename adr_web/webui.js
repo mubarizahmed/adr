@@ -6,6 +6,30 @@ var manager;
 var teleop;
 var ros;
 
+var mymap = L.map('mapid').setView([51.793770, 6.142411], 15);
+
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1
+}).addTo(mymap);
+
+var pos = L.marker([51.793770, 6.142411]);
+pos.addTo(mymap);
+
+
+function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(mymap);
+}
+
+mymap.on('click', onMapClick);
+
 function moveAction(linear, angular) {
     if (linear !== undefined && angular !== undefined) {
         twist.linear.x = linear;
@@ -61,17 +85,22 @@ function initTeleopKeyboard() {
         document.getElementById("control-speed-value").innerHTML = String(robotSpeedRange.value / 100) + " m/s"
     }
 }
-function initGPS(){
+
+function initGPS() {
     var gps_listener = new ROSLIB.Topic({
-        ros : ros,
-        name : '/sensor_msgs/NavSatFix',
-        messageType : 'sensor_msgs/NavSatFix',
-      });
-    
-    gps_listener.subscribe(function(m) {
-        document.getElementById("gps-text").innerHTML = "Latitude: "+String(m.latitude)+"\nLongitude: "+String(m.longitude);
+        ros: ros,
+        name: '/sensor_msgs/NavSatFix',
+        messageType: 'sensor_msgs/NavSatFix',
+    });
+
+    gps_listener.subscribe(function (m) {
+        mymap.setView([m.latitude,m.longitude]);
+        mymap.removeLayer(pos);
+        pos = L.marker([m.latitude,m.longitude]);
+        pos.addTo(mymap);
     });
 }
+
 function createJoystick() {
     // Check if joystick was aready created
     if (manager == null) {
@@ -80,7 +109,10 @@ function createJoystick() {
         // https://yoannmoinet.github.io/nipplejs/
         var options = {
             zone: joystickContainer,
-            position: { left: 50 + '%', bottom: 50 + '%'},
+            position: {
+                left: 50 + '%',
+                bottom: 50 + '%'
+            },
             mode: 'static',
             size: 100,
             color: '#0066ff',
@@ -132,14 +164,13 @@ window.onload = function () {
     initVelocityPublisher();
     // get handle for video placeholder
     video = document.getElementById('video');
-    ros.on('connection', function() {
-    // Populate video source 
-    video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/image_raw&type=mjpeg&quality=80";
+    ros.on('connection', function () {
+        // Populate video source 
+        video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/image_raw&type=mjpeg&quality=80";
     });
     createJoystick();
     initTeleopKeyboard();
+
+
+
 }
-
-
-
-
