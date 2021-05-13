@@ -58,6 +58,7 @@ function initTeleopKeyboard() {
     robotSpeedRange = document.getElementById("robot-speed");
     robotSpeedRange.oninput = function () {
         teleop.scale = robotSpeedRange.value / 100
+        document.getElementById("control-speed-value").innerHTML = String(robotSpeedRange.value / 100) + " m/s"
     }
 }
 function initGPS(){
@@ -79,9 +80,9 @@ function createJoystick() {
         // https://yoannmoinet.github.io/nipplejs/
         var options = {
             zone: joystickContainer,
-            position: { left: 50 + '%', top: 105 + 'px' },
+            position: { left: 50 + '%', bottom: 50 + '%'},
             mode: 'static',
-            size: 200,
+            size: 100,
             color: '#0066ff',
             restJoystick: true
         };
@@ -131,13 +132,12 @@ window.onload = function () {
     initVelocityPublisher();
     // get handle for video placeholder
     video = document.getElementById('video');
+    ros.on('connection', function() {
     // Populate video source 
     video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/image_raw&type=mjpeg&quality=80";
-    video.onload = function () {
-        // joystick and keyboard controls will be available only when video is correctly loaded
-        createJoystick();
-        initTeleopKeyboard();
-    };
+    });
+    createJoystick();
+    initTeleopKeyboard();
 }
 
 
